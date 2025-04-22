@@ -17,10 +17,10 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerShown: true,
+          headerShown: false,
           animation: "slide_from_right",
         }}
-        initialRouteName="Login"
+        initialRouteName="Home"
       >
         <Stack.Screen headerShown={false} name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
