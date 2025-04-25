@@ -20,10 +20,24 @@ const AppNavigator = () => {
           headerShown: false,
           animation: "slide_from_right",
         }}
-        initialRouteName="Home"
+        initialRouteName="Login"
       >
-        <Stack.Screen headerShown={false} name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen
+          headerShown={false}
+          name="Login"
+          component={LoginScreen}
+          options={{
+            gestureEnabled: false, // disables iOS swipe-back
+            headerShown: false, // optional
+          }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{
+            headerShown: true, // optional
+          }}
+        />
         <Stack.Screen name="Home" component={HomeScreen} />
 
         <Stack.Screen name="Profile" component={ProfileScreen} />

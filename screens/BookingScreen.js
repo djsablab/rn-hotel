@@ -1,9 +1,9 @@
 // screens/BookingScreen.js
-import React from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db, auth } from '../firebaseConfig';
-
+import React from "react";
+import { View, Text, Button, StyleSheet, Alert, Image } from "react-native";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { db, auth } from "../firebaseConfig";
+import RoundedButton from "../components/RoundedButton";
 export default function BookingScreen({ route, navigation }) {
   const { room, hotel } = route.params;
 
@@ -11,11 +11,12 @@ export default function BookingScreen({ route, navigation }) {
     try {
       const user = auth.currentUser;
       if (!user) {
-        Alert.alert("Lütfen giriş yapın");
+        Alert.alert("Please log in to app.");
+        navigation.navigate("Login");
         return;
       }
 
-      await addDoc(collection(db, 'bookings'), {
+      await addDoc(collection(db, "bookings"), {
         userId: user.uid,
         hotelId: hotel.id,
         roomId: room.id,
@@ -25,26 +26,45 @@ export default function BookingScreen({ route, navigation }) {
         price: room.price,
       });
 
-      Alert.alert("Rezervasyon başarıyla yapıldı!");
-      navigation.navigate('Home');
+      Alert.alert("Information", "Booking was successful!");
+      navigation.navigate("Home");
     } catch (e) {
-      console.log('Rezervasyon hatası:', e);
-      Alert.alert("Bir hata oluştu.");
+      console.log("Error:", "An unexocpected error occured:", e);
+      Alert.alert("Error", "An unexpected error occured.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Rezervasyon</Text>
-      <Text>Otel: {hotel.name}</Text>
-      <Text>Oda: {room.name}</Text>
-      <Text>Fiyat: {room.price}₺</Text>
-      <Button title="Rezerve Et" onPress={handleBooking} />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.title}>Booking for: {room.name}</Text>
+        <Image
+          source={{ uri: hotel.imageUrl }}
+          style={{ width: "100%", height: 200, marginBottom: 10 }}
+        />
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+          Booking Details
+        </Text>
+        <Text style={{ fontSize: 14, marginBottom: 10 }}>
+          Please confirm your booking details:
+        </Text>
+        <Text>🏨 Hotel: {hotel.name}</Text>
+        <Text>🔑 Room: {room.name}</Text>
+        <Text>💵 Price: {room.price}$</Text>
+        <Text>🕺 Capacity: {room.capacity} People</Text>
+        <Text>✅ Available: {room.available ? "Yes" : "No"}</Text>
+      </View>
+      <RoundedButton
+        title="Confirm Booking"
+        onPress={handleBooking}
+        color="#007BFF"
+        style={{ marginTop: 20 }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  container: { flex: 1, padding: 20, paddingTop: 50 },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
 });

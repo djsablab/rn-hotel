@@ -1,19 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   FlatList,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Button,
   Pressable,
+  StyleSheet,
+  TextInput,
+  Image,
+  Animated,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { Ionicons } from "@expo/vector-icons";
+
 export default function HomeScreen({ navigation }) {
   const [hotels, setHotels] = useState([]);
-  const [toggle, setToggle] = useState([]);
+  const [filteredHotels, setFilteredHotels] = useState([]);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const inputAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(inputAnim, {
+      toValue: searchVisible ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [searchVisible]);
+
   useEffect(() => {
     const fetchHotels = async () => {
       try {
@@ -23,103 +36,138 @@ export default function HomeScreen({ navigation }) {
           ...doc.data(),
         }));
         setHotels(hotelList);
+        setFilteredHotels(hotelList);
       } catch (e) {
-        console.log("Veri çekme hatası:", e);
+        console.log("Failed to fetch hotels:", e);
       }
     };
 
     fetchHotels();
   }, []);
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+    const filtered = hotels.filter((hotel) =>
+      hotel.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredHotels(filtered);
+  };
+
   const renderHotel = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
+    <Pressable
+      style={styles.hotelCard}
       onPress={() => navigation.navigate("HotelDetail", { hotel: item })}
     >
       <Image source={{ uri: item.imageUrl }} style={styles.image} />
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.desc}>{item.description}</Text>
-      <Text style={styles.location}>{item.location}</Text>
-    </TouchableOpacity>
+      <Text style={styles.hotelName}>{item.name}</Text>
+      <Text style={styles.hotelDesc}>{item.description}</Text>
+      <View style={styles.hotelLocationContainer}>
+        <Ionicons name="location-outline" size={20} color="#000" />
+        <Text style={styles.hotelLocation}>{item.location}</Text>
+      </View>
+    </Pressable>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View
+        <Pressable onPress={() => setSearchVisible(!searchVisible)}>
+          <Ionicons name="search" size={24} color="#000" />
+        </Pressable>
+        <Text style={styles.headerTitle}>RN-Hotel</Text>
+        <Pressable onPress={() => navigation.navigate("Profile")}>
+          <Ionicons name="person-circle-outline" size={28} color="#000" />
+        </Pressable>
+      </View>
+
+      {searchVisible && (
+        <Animated.View
           style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 10,
-            alignItems: "center",
+            opacity: inputAnim,
+            transform: [
+              {
+                translateY: inputAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-40, 0], // slide down
+                }),
+              },
+            ],
           }}
         >
-          <Image
-            source={require("../assets/icon.png")}
-            style={{ width: 40, height: 40 }}
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Type to search hotels"
+            value={searchText}
+            onChangeText={handleSearch}
           />
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-            RN-Hotel
-          </Text>
-        </View>
+        </Animated.View>
+      )}
 
-        <View style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-            <Image
-              source={require("../assets/search.png")}
-              style={{ width: 30, height: 30}}
-              
-            />
-          </Pressable>
-
-          <Pressable onPress={() => navigation.navigate("Profile")}>
-            <Image
-              source={require("../assets/user.png")}
-              style={{ width: 30, height: 30 }}
-            />
-          </Pressable>
-        </View>
-      </View>
       <FlatList
-        data={hotels}
-        keyExtractor={(item) => item.id}
+        data={filteredHotels}
         renderItem={renderHotel}
-        contentContainerStyle={{ padding: 10 }}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 100 }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { paddingTop: 25, flex: 1, backgroundColor: "#fff" },
-  card: {
-    marginBottom: 15,
-    borderRadius: 10,
-    backgroundColor: "#f1f1f1",
-    overflow: "hidden",
-  },
-  image: { width: "100%", height: 200 },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-    paddingHorizontal: 10,
-    paddingTop: 10,
-  },
-  desc: { fontSize: 14, paddingHorizontal: 10, paddingBottom: 10 },
-  location: {
-    fontSize: 14,
-    color: "#666",
-    paddingHorizontal: 10,
-    paddingBottom: 10,
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
   header: {
-    margin: 10,
-    padding: 12,
-    backgroundColor: "red",
-    display: "flex",
-    justifyContent: "space-between",
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  hotelCard: {
+    borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 10,
+    marginBottom: 10,
+  },
+  hotelName: {
+    fontSize: 18,
+    paddingHorizontal: 10,
+    color: "#333",
+    fontWeight: "bold",
+  },
+  hotelLocation: {
+    fontSize: 16,
+    color: "#666",
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  image: { width: "100%", height: 200, borderRadius: 8, marginBottom: 10 },
+
+  hotelDesc: {
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    fontSize: 14,
+    color: "#666",
+  },
+  hotelLocationContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
 });
