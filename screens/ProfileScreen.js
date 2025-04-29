@@ -66,7 +66,6 @@ export default function ProfileScreen({ navigation }) {
         });
     }
   };
-
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
@@ -94,7 +93,10 @@ export default function ProfileScreen({ navigation }) {
         <>
           <View style={styles.header}>
             <Text style={styles.title}>Hi {userInfo.name}!</Text>
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              activeOpacity={0.75}
+            >
               <Ionicons name="settings-outline" size={28} color="#333" />
             </TouchableOpacity>
           </View>

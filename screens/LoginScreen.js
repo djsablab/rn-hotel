@@ -22,7 +22,7 @@ export default function LoginScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        return true; // Prevent going back
+        return true;
       };
 
       BackHandler.addEventListener("hardwareBackPress", onBackPress);

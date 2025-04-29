@@ -3,16 +3,16 @@ import {
   View,
   Text,
   FlatList,
-  Pressable,
   StyleSheet,
   TextInput,
+  Pressable,
   Image,
   Animated,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
-
+import PressableIon from "../components/PressableIon";
 export default function HomeScreen({ navigation }) {
   const [hotels, setHotels] = useState([]);
   const [filteredHotels, setFilteredHotels] = useState([]);
@@ -71,13 +71,34 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => setSearchVisible(!searchVisible)}>
-          <Ionicons name="search" size={24} color="#000" />
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <PressableIon
+            onPress={() => setSearchVisible(!searchVisible)}
+            name="search-outline"
+            size={28}
+            color="#333"
+          />
+          <PressableIon
+            onPress={() => navigation.navigate("Tutorial")}
+            name="help-outline"
+            size={28}
+            color="#333"
+          />
+        </View>
+
         <Text style={styles.headerTitle}>RN-Hotel</Text>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Ionicons name="person-circle-outline" size={28} color="#000" />
-        </Pressable>
+
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {/* dummy pressableion for spacing */}
+          <PressableIon name="person-outline" size={28} color="#00000000" />
+          {/* real preessableion */}
+          <PressableIon
+            onPress={() => navigation.navigate("Profile")}
+            name="person-outline"
+            size={28}
+            color="#333"
+          />
+        </View>
       </View>
 
       {searchVisible && (
@@ -130,9 +151,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "bold",
+    textAlign: "center",
   },
   hotelCard: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#ccc",
     borderRadius: 10,
     marginBottom: 10,
@@ -152,9 +174,9 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 10,
     borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: 14,
   },
-  image: { width: "100%", height: 200, borderRadius: 8, marginBottom: 10 },
+  image: { width: "100%", height: 200, borderRadius: 6, marginBottom: 10 },
 
   hotelDesc: {
     paddingHorizontal: 10,
