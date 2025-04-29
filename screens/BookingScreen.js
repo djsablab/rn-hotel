@@ -1,17 +1,27 @@
-// screens/BookingScreen.js
 import React from "react";
-import { View, Text, Button, StyleSheet, Alert, Image } from "react-native";
+import { View, Text,StyleSheet,Image } from "react-native";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import RoundedButton from "../components/RoundedButton";
+import Toast from "react-native-toast-message";
 export default function BookingScreen({ route, navigation }) {
   const { room, hotel } = route.params;
-
+  const handleMessage = ({
+    type = "success",
+    text1 = "Hello",
+    text2 = "This is something 👋",
+  }) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+      position: "bottom",
+    });
+  };
   const handleBooking = async () => {
     try {
       const user = auth.currentUser;
       if (!user) {
-        Alert.alert("Please log in to app.");
         navigation.navigate("Login");
         return;
       }
@@ -25,12 +35,20 @@ export default function BookingScreen({ route, navigation }) {
         roomName: room.name,
         price: room.price,
       });
-
-      Alert.alert("Information", "Booking was successful!");
-      navigation.navigate("Home");
+      handleMessage({
+        type: "success",
+        text1: "Booking Confirmed",
+        text2: "Your booking has been confirmed.",
+      });
+      setTimeout(() => {
+        navigation.navigate("Home");
+      }, 4000);
     } catch (e) {
-      console.log("Error:", "An unexocpected error occured:", e);
-      Alert.alert("Error", "An unexpected error occured.");
+      handleMessage({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to confirm booking.",
+      });
     }
   };
 
@@ -59,7 +77,9 @@ export default function BookingScreen({ route, navigation }) {
         onPress={handleBooking}
         color="#007BFF"
         style={{ marginTop: 20 }}
+        status={room.available}
       />
+      <Toast />
     </View>
   );
 }

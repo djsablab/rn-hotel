@@ -5,6 +5,7 @@ import { auth } from "../firebaseConfig";
 import RoundedButton from "../components/RoundedButton";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import Toast from "react-native-toast-message";
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +17,26 @@ export default function LoginScreen({ navigation }) {
       navigation.navigate("Home");
     } catch (e) {
       setError(e.message);
+      handleMessage({
+        type: "error",
+        text1: "Error",
+        text2:
+          error === "Firebase: Error (auth/user-not-found)."
+            ? "User not found."
+            : error || error === "Firebase: Error (auth/wrong-password)."
+            ? "Incorrect password."
+            : error || error === "Firebase: Error (auth/invalid-email)."
+            ? "Invalid email."
+            : error || error === "Firebase: Error (auth/too-many-requests)."
+            ? "Too many attempts."
+            : error || error === "Firebase: Error (auth/user-disabled)."
+            ? "This account has been disabled."
+            : error || error === "Firebase: Error (auth/weak-password)."
+            ? "Password is too weak. It should be at least 6 characters."
+            : error || error === "Firebase: Error (auth/missing-password)."
+            ? "Please enter a password."
+            : error,
+      });
     }
   };
 
@@ -30,6 +51,18 @@ export default function LoginScreen({ navigation }) {
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }, [])
   );
+  const handleMessage = ({
+    type = "success",
+    text1 = "Hello",
+    text2 = "This is something 👋",
+  }) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+      position: "bottom",
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -48,30 +81,10 @@ export default function LoginScreen({ navigation }) {
         style={styles.input}
       />
       <RoundedButton title="Login" onPress={handleLogin} color="#007BFF" />
-      {/* Error menance :P */}
-      {error ? (
-        <Text style={styles.error}>
-          {error === "Firebase: Error (auth/user-not-found)."
-            ? "User not found."
-            : error && error === "Firebase: Error (auth/wrong-password)."
-            ? "Incorrect password."
-            : error && error === "Firebase: Error (auth/invalid-email)."
-            ? "Invalid email."
-            : error && error === "Firebase: Error (auth/too-many-requests)."
-            ? "Too many attempts."
-            : error && error === "Firebase: Error (auth/user-disabled)."
-            ? "This account has been disabled."
-            : error && error === "Firebase: Error (auth/weak-password)."
-            ? "Password is too weak. It should be at least 6 characters."
-            : error && error === "Firebase: Error (auth/missing-password)."
-            ? "Please enter a password."
-            : error}
-        </Text>
-      ) : null}
-
       <Text onPress={() => navigation.navigate("Register")} style={styles.link}>
         No account? Register now!
       </Text>
+      <Toast />
     </View>
   );
 }
@@ -80,6 +93,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20 },
   title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
   input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 12 },
-  error: { color: "red", marginTop: 10, textAlign: "center" },
   link: { color: "blue", marginTop: 10, textAlign: "center" },
 });

@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Alert,
   Modal,
   TouchableOpacity,
   FlatList,
@@ -15,12 +14,26 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import RoundedButton from "../components/RoundedButton";
+import Toast from "react-native-toast-message";
 
 export default function ProfileScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState("");
   const [reservations, setReservations] = useState([]);
+
+  const handleMessage = ({
+    type = "success",
+    text1 = "Hello",
+    text2 = "This is something 👋",
+  }) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+      position: "bottom",
+    });
+  };
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -48,7 +61,11 @@ export default function ProfileScreen({ navigation }) {
         setReservations(bookingList);
       }
     } catch (error) {
-      console.log("Could not fetch bookings:", error);
+      handleMessage({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to fetch bookings.",
+      });
     }
   };
   const handleUpdateProfile = () => {
@@ -56,13 +73,20 @@ export default function ProfileScreen({ navigation }) {
     if (user) {
       updateProfile(user, { displayName: newName })
         .then(() => {
-          Alert.alert("Information", "You name has been updated.");
+          handleMessage({
+            type: "success",
+            text1: "Name changing",
+            text2: "Your name has changed.",
+          });
           setUserInfo((prev) => ({ ...prev, name: newName }));
           setModalVisible(false);
         })
         .catch((error) => {
-          Alert.alert("Error!", "Name could not be updated.");
-          console.log(error);
+          handleMessage({
+            type: "error",
+            text1: "Name changing",
+            text2: "Your name change was failed.",
+          });
         });
     }
   };
@@ -72,8 +96,11 @@ export default function ProfileScreen({ navigation }) {
         navigation.replace("Login");
       })
       .catch((err) => {
-        Alert.alert("Error!", "Could not sign out.");
-        console.log(err);
+        handleMessage({
+          type: "error",
+          text1: "Sign out",
+          text2: "Could not sign out.",
+        });
       });
   };
 
@@ -163,6 +190,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+      <Toast />
     </View>
   );
 }

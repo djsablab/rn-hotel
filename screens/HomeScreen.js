@@ -13,12 +13,26 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import PressableIon from "../components/PressableIon";
+import Toast from "react-native-toast-message";
 export default function HomeScreen({ navigation }) {
   const [hotels, setHotels] = useState([]);
   const [filteredHotels, setFilteredHotels] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const inputAnim = useRef(new Animated.Value(0)).current;
+
+  const handleMessage = ({
+    type = "success",
+    text1 = "Hello",
+    text2 = "This is something 👋",
+  }) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+    });
+  };
+
   useEffect(() => {
     Animated.timing(inputAnim, {
       toValue: searchVisible ? 1 : 0,
@@ -38,7 +52,11 @@ export default function HomeScreen({ navigation }) {
         setHotels(hotelList);
         setFilteredHotels(hotelList);
       } catch (e) {
-        console.log("Failed to fetch hotels:", e);
+        handleMessage({
+          type: "error",
+          text: "Error",
+          text2: "Failed to fetch hotels!",
+        });
       }
     };
 
@@ -130,6 +148,7 @@ export default function HomeScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 100 }}
       />
+      <Toast />
     </View>
   );
 }

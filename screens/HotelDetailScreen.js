@@ -10,6 +10,7 @@ import {
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 export default function HotelDetailScreen({ route, navigation }) {
   const { hotel } = route.params;
   const [rooms, setRooms] = useState([]);
@@ -25,12 +26,29 @@ export default function HotelDetailScreen({ route, navigation }) {
         }));
         setRooms(roomList);
       } catch (error) {
-        console.log("ERROR! Failed to fetch rooms: ", error);
+        handleMessage({
+          type: "error",
+          text1: "Error",
+          text2: "Failed to fetch rooms.",
+        });
       }
     };
 
     fetchRooms();
   }, []);
+
+  const handleMessage = ({
+    type = "success",
+    text1 = "Hello",
+    text2 = "This is something 👋",
+  }) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+      position: "bottom",
+    });
+  };
 
   const renderRoom = ({ item }) => (
     <TouchableOpacity
@@ -55,13 +73,14 @@ export default function HotelDetailScreen({ route, navigation }) {
         <Ionicons name="location-outline" size={20} color="#000" />
         <Text style={styles.hotelLocation}>{hotel.location}</Text>
       </View>
-      <Text style={styles.sectionTitle}>🔑 Odalar</Text>
+      <Text style={styles.sectionTitle}>🔑 Rooms</Text>
       <FlatList
         data={rooms}
         keyExtractor={(item) => item.id}
         renderItem={renderRoom}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
+      <Toast />
     </View>
   );
 }

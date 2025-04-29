@@ -1,12 +1,12 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
-export default function RoundedButton({ title, onPress, color, style }) {
+export default function RoundedButton({ title, onPress, color, style,status = true }) {
   return (
     <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.75}
+      onPress={status ? onPress : null}
+      activeOpacity={ status ? 0.75 : 1}
       style={{
-        backgroundColor: color,
+        backgroundColor: status ? color : "#ccc" || color,
         borderRadius: 30,
         paddingVertical: 10,
         paddingHorizontal: 20,
