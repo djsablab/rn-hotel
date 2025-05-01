@@ -104,16 +104,37 @@ export default function ProfileScreen({ navigation }) {
       });
   };
 
-  const renderReservation = ({ item }) => (
-    <View style={styles.reservationCard}>
-      <Text style={styles.reservationTitle}>{item.hotelName}</Text>
-      <Text style={styles.reservationDetail}>Room: {item.roomName}</Text>
-      <Text style={styles.reservationDetail}>
-        Date: {item.bookedAt.toDate().toLocaleString()}
-      </Text>
-    </View>
-  );
-
+  const renderReservation = ({ item }) => {
+    const start = item.startDate?.toDate?.();
+    const end = item.endDate?.toDate?.();
+  
+    const startStr = start ? start.toLocaleDateString() : "N/A";
+    const endStr = end ? end.toLocaleDateString() : "N/A";
+  
+    const nights =
+      start && end
+        ? Math.max(
+            Math.ceil((end - start) / (1000 * 60 * 60 * 24)),
+            1
+          )
+        : 0;
+  
+    const totalPrice = item.roomPrice ? item.roomPrice * nights : "N/A";
+  
+    return (
+      <View style={styles.reservationCard}>
+        <Text style={styles.reservationTitle}>{item.hotelName}</Text>
+        <Text style={styles.reservationDetail}>Room: {item.roomName}</Text>
+        <Text style={styles.reservationDetail}>
+          Dates: {startStr} → {endStr}
+        </Text>
+        <Text style={styles.reservationDetail}>
+          Nights: {nights} | Total: ${totalPrice}
+        </Text>
+      </View>
+    );
+  };
+  
   return (
     <View style={styles.container}>
       {userInfo && (
