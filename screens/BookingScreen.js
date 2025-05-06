@@ -114,11 +114,6 @@ export default function BookingScreen({ route, navigation }) {
         text1: "Booking Confirmed!",
         text2: `You booked ${room.name} at ${hotel.name}`,
       });
-
-      setTimeout(() => {
-        navigation.navigate("Home");
-      }, 4000);
-
     } catch (error) {
       console.error("Booking error:", error);
       handleMessage({
@@ -132,9 +127,18 @@ export default function BookingScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Image source={{ uri: hotel.imageUrl }} style={styles.image} />
-      <View style={{flexDirection: "row", justifyContent: "space-between",alignItems: "center"}}>
-      <Text style={styles.title}>{room.name}</Text>
-      <Text style={styles.notAvailable}> {room.available ? "" : "Not Available"}</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Text style={styles.title}>{room.name}</Text>
+        <Text style={styles.notAvailable}>
+          {" "}
+          {room.available ? "" : "Not Available"}
+        </Text>
       </View>
       <Text style={styles.price}>${room.price} / night</Text>
       <Text style={styles.label}>Select Booking Range:</Text>

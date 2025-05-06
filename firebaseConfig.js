@@ -4,7 +4,7 @@ import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
 // DO NOT USE THE firebaseConfig CONFIGURATION IN PRODUCTION WITHOUT MODIFYING WITH YOURS!!!
-// Or every single thing will be in mine firebase instead :D
+// Or every single thing will be mine in firebase instead :D
 // Better to check the official documentation:
 // https://firebase.google.com/docs/web/setup?hl=en&authuser=0
 
